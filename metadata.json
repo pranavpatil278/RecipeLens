@@ -1,0 +1,6 @@
+{
+  "name": "RecipeLens",
+  "description": "Your camera becomes your AI chef. Identify dishes, detect ingredients, generate customized recipes, and cook step-by-step.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

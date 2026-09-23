@@ -1,0 +1,770 @@
+@import "tailwindcss";
+
+@keyframes scanLineContinuous {
+  0% {
+    top: 4%;
+  }
+  50% {
+    top: 96%;
+  }
+  100% {
+    top: 4%;
+  }
+}
+
+@keyframes scanGlowPulse {
+  0%, 100% {
+    opacity: 0.65;
+    filter: drop-shadow(0 0 6px rgba(163, 184, 157, 0.6));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 14px rgba(163, 184, 157, 0.95));
+  }
+}
+
+@keyframes reticlePulse {
+  0%, 100% {
+    border-color: rgba(38, 58, 32, 0.3);
+    box-shadow: inset 0 0 12px rgba(163, 184, 157, 0.12);
+  }
+  50% {
+    border-color: rgba(38, 58, 32, 0.65);
+    box-shadow: inset 0 0 20px rgba(163, 184, 157, 0.35);
+  }
+}
+
+@keyframes captureFlash {
+  0%, 100% {
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+  18% {
+    filter: drop-shadow(0 0 11px rgba(255, 255, 255, 1));
+  }
+  32% {
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
+  }
+}
+
+@keyframes sparkleTwinkle {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+  50% {
+    transform: rotate(18deg) scale(1.18);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
+  }
+}
+
+@keyframes continuousFireFlow {
+  0%, 100% {
+    transform: rotate(0deg) scale(0.97, 1);
+    filter: drop-shadow(0 0 3px rgba(255, 83, 20, 0.62));
+  }
+  50% {
+    transform: rotate(180deg) scale(1.03, 0.96);
+    filter: drop-shadow(0 0 7px rgba(255, 174, 37, 0.82));
+  }
+  100% {
+    transform: rotate(360deg) scale(0.97, 1);
+    filter: drop-shadow(0 0 3px rgba(255, 83, 20, 0.62));
+  }
+}
+
+@keyframes continuousFireFlicker {
+  0%, 100% {
+    transform: rotate(360deg) scale(1, 0.96);
+    opacity: 0.68;
+  }
+  35% {
+    transform: rotate(220deg) scale(0.96, 1.04);
+    opacity: 1;
+  }
+  70% {
+    transform: rotate(80deg) scale(1.04, 0.98);
+    opacity: 0.82;
+  }
+}
+
+@keyframes sliderAdjust {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  35% {
+    transform: translateX(2px) rotate(4deg);
+  }
+  70% {
+    transform: translateX(-2px) rotate(-4deg);
+  }
+}
+
+@keyframes timerTick {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(10deg) scale(1.08);
+  }
+  50% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes messagePulse {
+  0%, 100% {
+    transform: translateY(0);
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+  50% {
+    transform: translateY(-3px);
+    filter: drop-shadow(0 5px 5px rgba(255, 255, 255, 0.3));
+  }
+}
+
+.workflow-icon {
+  position: relative;
+}
+
+.group:hover .workflow-icon--capture {
+  animation: captureFlash 1.15s steps(1, end) infinite;
+}
+
+.group:hover .workflow-icon--analysis svg {
+  animation: sparkleTwinkle 1.3s ease-in-out infinite;
+}
+
+.workflow-flame-ring {
+  position: absolute;
+  inset: -12px;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 450ms ease;
+}
+
+.workflow-flame-ring::before,
+.workflow-flame-ring::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  padding: 3px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.workflow-flame-ring::before {
+  inset: 7px;
+  background: repeating-conic-gradient(
+    from 0deg,
+    #9e2117 0deg 10deg,
+    #f04a18 10deg 22deg,
+    #ffca3e 22deg 29deg,
+    #d93117 29deg 41deg,
+    #ff8a1b 41deg 54deg,
+    #8e2117 54deg 66deg
+  );
+  animation: continuousFireFlow 1.65s linear infinite;
+}
+
+.workflow-flame-ring::after {
+  inset: 10px;
+  padding: 2px;
+  background: repeating-conic-gradient(
+    from 160deg,
+    #ffe16a 0deg 9deg,
+    #ff7419 9deg 23deg,
+    #c32b17 23deg 35deg,
+    #ffad25 35deg 47deg
+  );
+  animation: continuousFireFlicker 780ms ease-in-out infinite;
+}
+
+.group:hover .workflow-flame-ring {
+  opacity: 1;
+}
+
+.group:hover .workflow-icon--customize svg {
+  animation: sliderAdjust 1.4s ease-in-out infinite;
+}
+
+.group:hover .workflow-icon--cooking svg {
+  animation: timerTick 1s ease-in-out infinite;
+}
+
+.group:hover .workflow-icon--assistant svg {
+  animation: messagePulse 1.2s ease-in-out infinite;
+}
+
+.animate-scan-line-continuous {
+  animation: scanLineContinuous 2.4s ease-in-out infinite;
+}
+
+.animate-scan-glow {
+  animation: scanGlowPulse 2.4s ease-in-out infinite;
+}
+
+.animate-reticle-pulse {
+  animation: reticlePulse 2.4s ease-in-out infinite;
+}
+
+@keyframes askChefScan {
+  0% { transform: translateX(-130%); opacity: 0; }
+  15%, 75% { opacity: 0.8; }
+  100% { transform: translateX(230%); opacity: 0; }
+}
+
+@keyframes askChefHud {
+  0%, 100% { opacity: 0.25; transform: rotate(0deg) scale(0.96); }
+  50% { opacity: 0.8; transform: rotate(8deg) scale(1.04); }
+}
+
+@keyframes chefTransitionWarp {
+  0% { transform: scale(0.82); opacity: 0; }
+  25%, 75% { opacity: 1; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+
+.ask-chef-cta {
+  position: relative;
+  overflow: visible;
+  isolation: isolate;
+  border: 1px solid rgba(159, 220, 255, 0.18);
+}
+
+.ask-chef-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(153, 225, 255, 0);
+  transition: border-color 300ms ease, box-shadow 300ms ease;
+  pointer-events: none;
+}
+
+.ask-chef-cta:hover::before {
+  border-color: rgba(153, 225, 255, 0.65);
+  box-shadow: inset 0 0 16px rgba(99, 206, 255, 0.12), 0 0 18px rgba(67, 157, 255, 0.22);
+}
+
+.ask-chef-cta__scan {
+  position: absolute;
+  inset: 0 auto 0 -35%;
+  width: 24%;
+  background: linear-gradient(90deg, transparent, rgba(182, 239, 255, 0.6), transparent);
+  transform: skewX(-18deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ask-chef-robot {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 1.65rem;
+  border: 1px solid rgba(143, 224, 255, 0.72);
+  border-radius: 0.55rem 0.55rem 0.35rem 0.35rem;
+  color: #b9efff;
+  background: linear-gradient(180deg, #183d51, #0b1d2d);
+  box-shadow: 0 0 12px rgba(66, 197, 255, 0.42), inset 0 0 8px rgba(136, 228, 255, 0.14);
+  transform: translate(-50%, 0) scale(0.72);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 250ms ease;
+}
+
+.ask-chef-robot::before {
+  content: '';
+  position: absolute;
+  top: -0.35rem;
+  left: 50%;
+  width: 1px;
+  height: 0.35rem;
+  background: #9ceaff;
+  box-shadow: 0 0 5px #9ceaff;
+}
+
+.ask-chef-robot::after {
+  content: '';
+  position: absolute;
+  top: -0.52rem;
+  left: 50%;
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 999px;
+  background: #9ceaff;
+  box-shadow: 0 0 7px #9ceaff;
+  transform: translateX(-50%);
+}
+
+.ask-chef-robot i {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.32rem;
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 999px;
+  background: #6dffbf;
+  box-shadow: -0.55rem 0 0 #6dffbf, 0 0 5px #6dffbf;
+}
+
+.ask-chef-cta:hover .ask-chef-robot {
+  transform: translate(-50%, -40%) scale(1);
+  opacity: 1;
+}
+
+.ask-chef-cta:hover .ask-chef-cta__scan {
+  animation: askChefScan 1.4s ease-in-out infinite;
+}
+
+.ask-chef-cta__hud {
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  border: 1px solid rgba(118, 214, 255, 0.45);
+  clip-path: polygon(0 18%, 10% 18%, 10% 0, 36% 0, 36% 6%, 64% 6%, 64% 0, 90% 0, 90% 18%, 100% 18%, 100% 82%, 90% 82%, 90% 100%, 64% 100%, 64% 94%, 36% 94%, 36% 100%, 10% 100%, 10% 82%, 0 82%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ask-chef-cta:hover .ask-chef-cta__hud {
+  animation: askChefHud 1.8s ease-in-out infinite;
+}
+
+.chef-transition,
+.chef-lab {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  background: #030611;
+}
+
+.chef-transition__video,
+.chef-transition__vignette {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.chef-transition__video {
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.96;
+  transform: scale(1.02);
+  animation: chefTransitionVideoIn 700ms ease-out both;
+}
+
+.chef-transition__vignette {
+  background: radial-gradient(circle at center, transparent 0 17%, rgba(2, 4, 16, 0.28) 44%, rgba(1, 2, 8, 0.92) 100%);
+}
+
+.chef-transition--complete .chef-transition__video {
+  animation: chefTransitionFadeExit 700ms ease-in-out both;
+}
+
+.chef-transition--complete .chef-transition__vignette {
+  animation: chefTransitionVignetteExit 700ms ease-in-out both;
+}
+
+@keyframes chefTransitionFadeExit {
+  0% { opacity: 0.96; transform: scale(1.02); filter: brightness(0.92) saturate(1); }
+  100% { opacity: 0; transform: scale(1.04); filter: brightness(1) saturate(1); }
+}
+
+@keyframes chefTransitionVignetteExit {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.82; transform: scale(1.03); }
+}
+
+@keyframes chefTransitionVideoIn {
+  0% { opacity: 0; transform: scale(1.08); }
+  100% { opacity: 0.96; transform: scale(1.02); }
+}
+
+.chef-lab {
+  background: #050814;
+  color: white;
+}
+
+.chef-lab__atmosphere {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 72% 36%, rgba(30, 106, 166, 0.2), transparent 26%), radial-gradient(circle at 20% 80%, rgba(95, 30, 142, 0.2), transparent 30%), linear-gradient(135deg, #050814 0%, #091524 48%, #03050d 100%);
+}
+
+.chef-lab__robot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: min(70vw, 900px);
+  height: 78vh;
+  opacity: 0.72;
+  filter: blur(0.35px) saturate(0.86);
+}
+
+.chef-lab__topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem clamp(1.25rem, 4vw, 4rem);
+  border-bottom: 1px solid rgba(185, 225, 255, 0.12);
+  background: rgba(3, 8, 18, 0.48);
+  backdrop-filter: blur(18px);
+}
+
+.chef-lab__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border: 1px solid rgba(143, 220, 255, 0.38);
+  border-radius: 0.75rem;
+  color: #b8edff;
+  box-shadow: 0 0 20px rgba(54, 190, 255, 0.16);
+}
+
+.chef-lab__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.3rem;
+  padding: 0 0.75rem 0 0.2rem;
+  margin-right: 0.35rem;
+  border: 1px solid rgba(151, 218, 255, 0.22);
+  border-radius: 0.7rem;
+  color: rgba(209, 241, 255, 0.7);
+  background: rgba(87, 170, 214, 0.08);
+  font-size: 0.68rem;
+  cursor: pointer;
+  transition: color 200ms ease, background 200ms ease, border-color 200ms ease, transform 200ms ease;
+}
+
+.chef-lab__back:hover {
+  color: white;
+  border-color: rgba(151, 218, 255, 0.58);
+  background: rgba(87, 170, 214, 0.2);
+  transform: translateX(-2px);
+}
+
+.chef-lab__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border: 1px solid rgba(190, 226, 255, 0.22);
+  border-radius: 999px;
+  color: rgba(224, 244, 255, 0.8);
+  cursor: pointer;
+  transition: background 200ms ease, color 200ms ease;
+}
+
+.chef-lab__close:hover { background: rgba(151, 219, 255, 0.12); color: white; }
+
+.chef-lab__panel {
+  position: absolute;
+  top: 50%;
+  left: clamp(1rem, 8vw, 9rem);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  width: min(460px, calc(100vw - 2rem));
+  height: min(650px, calc(100vh - 8rem));
+  transform: translateY(-43%);
+  border: 1px solid rgba(166, 227, 255, 0.22);
+  border-radius: 1.5rem;
+  background: linear-gradient(145deg, rgba(18, 34, 52, 0.82), rgba(5, 12, 24, 0.72));
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 55px rgba(61, 162, 220, 0.12);
+  backdrop-filter: blur(22px);
+}
+
+.chef-lab__panel-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 1.4rem 1.4rem 1.15rem; border-bottom: 1px solid rgba(184, 225, 255, 0.12); }
+.chef-lab__status { display: flex; align-items: center; gap: 0.4rem; color: rgba(185, 235, 255, 0.7); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.chef-lab__status i { width: 0.4rem; height: 0.4rem; border-radius: 999px; background: #6dffbf; box-shadow: 0 0 10px #6dffbf; }
+.chef-lab__thread { flex: 1; overflow-y: auto; padding: 1.1rem; display: flex; flex-direction: column; gap: 0.9rem; }
+.chef-lab__message { display: flex; gap: 0.65rem; max-width: 90%; color: rgba(229, 245, 255, 0.86); font-size: 0.78rem; line-height: 1.55; }
+.chef-lab__message--user { align-self: flex-end; flex-direction: row-reverse; text-align: right; }
+.chef-lab__avatar { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 1.7rem; height: 1.7rem; border: 1px solid rgba(125, 216, 255, 0.3); border-radius: 0.55rem; color: #aeeaff; background: rgba(104, 188, 235, 0.12); }
+.chef-lab__message p { padding: 0.75rem 0.85rem; border: 1px solid rgba(172, 221, 255, 0.12); border-radius: 0.9rem; background: rgba(122, 189, 222, 0.09); }
+.chef-lab__message--user p { background: rgba(41, 135, 190, 0.26); border-color: rgba(116, 210, 255, 0.25); }
+.chef-lab__message time { display: block; margin-top: 0.3rem; color: rgba(187, 222, 242, 0.4); font-size: 0.6rem; }
+.chef-lab__typing { color: rgba(178, 221, 242, 0.62); font-size: 0.68rem; }
+.chef-lab__typing span { display: inline-block; width: 0.3rem; height: 0.3rem; margin-right: 0.25rem; border-radius: 999px; background: #8adfff; animation: pulse 900ms infinite alternate; }
+.chef-lab__suggestions { display: flex; gap: 0.45rem; overflow-x: auto; padding: 0.75rem 1rem; border-top: 1px solid rgba(184, 225, 255, 0.1); }
+.chef-lab__suggestions button { flex: 0 0 auto; padding: 0.45rem 0.65rem; border: 1px solid rgba(151, 218, 255, 0.2); border-radius: 999px; color: rgba(218, 244, 255, 0.72); background: rgba(87, 170, 214, 0.08); font-size: 0.65rem; cursor: pointer; }
+.chef-lab__suggestions button:hover { background: rgba(87, 170, 214, 0.2); }
+.chef-lab__composer { display: flex; gap: 0.6rem; padding: 1rem; border-top: 1px solid rgba(184, 225, 255, 0.1); }
+.chef-lab__composer input { min-width: 0; flex: 1; padding: 0.75rem 0.9rem; border: 1px solid rgba(156, 219, 255, 0.2); border-radius: 0.75rem; outline: none; color: #ecfaff; background: rgba(1, 7, 16, 0.5); font-size: 0.75rem; }
+.chef-lab__composer input:focus { border-color: rgba(126, 224, 255, 0.62); box-shadow: 0 0 15px rgba(65, 190, 255, 0.13); }
+.chef-lab__composer input::placeholder { color: rgba(190, 224, 241, 0.42); }
+.chef-lab__composer button { display: flex; align-items: center; justify-content: center; width: 2.7rem; border: 1px solid rgba(126, 221, 255, 0.4); border-radius: 0.75rem; color: #d9f7ff; background: rgba(54, 158, 205, 0.24); cursor: pointer; }
+.chef-lab__composer button:disabled { cursor: default; opacity: 0.35; }
+.chef-lab__readout { position: absolute; right: 3rem; bottom: 2rem; z-index: 2; display: flex; gap: 1.2rem; color: rgba(174, 220, 240, 0.42); font-size: 0.58rem; letter-spacing: 0.18em; }
+
+@media (max-width: 700px) {
+  .chef-lab__robot { right: -18rem; width: 48rem; height: 62vh; opacity: 0.38; }
+  .chef-lab__panel { top: auto; bottom: 1rem; left: 1rem; height: min(600px, calc(100vh - 8rem)); transform: none; }
+  .chef-lab__readout { display: none; }
+}
+
+/* Ask AI Chef workspace: intentionally empty behind the future video layer. */
+.chef-lab {
+  background: #0f1016;
+  opacity: 1;
+  overflow: hidden;
+  transform-origin: center center;
+  will-change: opacity, transform;
+  animation: chefLabReveal 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.chef-lab__background-video,
+.chef-lab__background-shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.chef-lab__background-video {
+  z-index: 0;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(0.82) contrast(1.04) brightness(0.62);
+}
+
+.chef-lab__background-shade {
+  z-index: 1;
+  background: linear-gradient(90deg, rgba(7, 8, 14, 0.42), rgba(7, 8, 14, 0.16) 52%, rgba(7, 8, 14, 0.46)), linear-gradient(0deg, rgba(7, 8, 14, 0.36), transparent 42%, rgba(7, 8, 14, 0.2));
+}
+
+@keyframes chefLabReveal {
+  0% { opacity: 1; transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.chef-lab__close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.chef-lab__workspace {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(100%, 760px);
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+.chef-lab__workspace > .chef-lab__composer {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 102px;
+  padding: 0.9rem 0.95rem 0.7rem;
+  border: 1px solid rgba(193, 202, 255, 0.38);
+  border-radius: 1.25rem;
+  background: rgba(7, 8, 13, 0.96);
+  box-shadow: 0 0 0 1px rgba(255, 119, 103, 0.08), 0 0 38px rgba(70, 112, 255, 0.13), 0 0 42px rgba(255, 119, 103, 0.1);
+}
+
+.chef-lab__workspace > .chef-lab__composer::before {
+  content: '';
+  position: absolute;
+  inset: -2.2rem -3.5rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 16% 52%, rgba(255, 102, 72, 0.48), transparent 34%), radial-gradient(ellipse at 84% 52%, rgba(67, 114, 255, 0.5), transparent 36%);
+  filter: blur(24px);
+  opacity: 0.78;
+}
+
+.chef-lab__gallery-input { display: none; }
+
+.chef-lab__attachment {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0.25rem 0 0.35rem;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid rgba(192, 199, 232, 0.2);
+  border-radius: 0.55rem;
+  color: rgba(239, 241, 252, 0.72);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.65rem;
+}
+
+.chef-lab__attachment img { width: 1.8rem; height: 1.8rem; border-radius: 0.35rem; object-fit: cover; }
+.chef-lab__attachment span { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chef-lab__attachment button { display: flex; align-items: center; justify-content: center; width: 1.4rem; height: 1.4rem; margin-left: 0.1rem; border: 0; border-radius: 999px; color: rgba(239, 241, 252, 0.65); background: transparent; cursor: pointer; }
+.chef-lab__attachment button:hover { color: white; background: rgba(255, 255, 255, 0.1); }
+
+.chef-lab__composer input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 0.15rem;
+  border: 0;
+  outline: none;
+  color: #f4f5ff;
+  background: transparent;
+  font-size: 0.9rem;
+}
+
+.chef-lab__composer input::placeholder { color: rgba(230, 233, 246, 0.62); }
+.chef-lab__composer input:focus { border: 0; box-shadow: none; }
+
+.chef-lab__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  min-height: 34px;
+}
+
+.chef-lab__toolbar button { font-family: inherit; }
+.chef-lab__toolbar-spacer { flex: 1; }
+
+.chef-lab__icon-button,
+.chef-lab__mode-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 30px;
+  padding: 0 0.65rem;
+  border: 1px solid rgba(182, 190, 220, 0.18);
+  border-radius: 999px;
+  color: rgba(234, 237, 250, 0.74);
+  background: rgba(255, 255, 255, 0.035);
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.chef-lab__icon-button { width: 30px; justify-content: center; padding: 0; }
+.chef-lab__icon-button:hover,
+.chef-lab__mode-button:hover { color: white; border-color: rgba(208, 214, 245, 0.42); background: rgba(255, 255, 255, 0.08); }
+
+.chef-lab__mode-wrap { position: relative; }
+
+.chef-lab__mode-menu {
+  position: absolute;
+  bottom: calc(100% + 0.55rem);
+  left: 0;
+  display: grid;
+  width: 286px;
+  padding: 0.45rem;
+  border: 1px solid rgba(184, 193, 226, 0.2);
+  border-radius: 0.9rem;
+  background: rgba(25, 27, 37, 0.98);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.46), 0 0 24px rgba(96, 115, 255, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.chef-lab__mode-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 52px;
+  padding: 0.6rem 0.7rem;
+  border: 0;
+  border-radius: 0.6rem;
+  color: rgba(233, 235, 247, 0.72);
+  background: transparent;
+  text-align: left;
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.chef-lab__mode-menu button:hover,
+.chef-lab__mode-menu button.is-selected { color: white; background: linear-gradient(90deg, rgba(123, 107, 255, 0.2), rgba(255, 255, 255, 0.06)); }
+.chef-lab__mode-menu button svg { color: #b7a9ff; }
+.chef-lab__mode-copy { display: flex; flex: 1; flex-direction: column; gap: 0.16rem; min-width: 0; }
+.chef-lab__mode-copy strong { color: rgba(249, 250, 255, 0.94); font-size: 0.75rem; font-weight: 650; line-height: 1.2; }
+.chef-lab__mode-copy small { overflow: hidden; color: rgba(212, 216, 238, 0.56); font-size: 0.65rem; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+.chef-lab__mode-button.is-listening { color: #ffb7ae; border-color: rgba(255, 130, 116, 0.62); background: rgba(255, 106, 92, 0.12); }
+
+.chef-lab__send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  color: white;
+  background: linear-gradient(135deg, #ec70ff, #756dff);
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(169, 107, 255, 0.5);
+}
+
+.chef-lab__send:disabled { cursor: default; opacity: 0.55; }
+
+.chef-lab__messages {
+  display: grid;
+  gap: 0.8rem;
+  width: 100%;
+  max-height: 45vh;
+  margin-top: 1.2rem;
+  overflow-y: auto;
+}
+
+.chef-lab__messages:empty { display: none; }
+.chef-lab__messages .chef-lab__message { display: block; max-width: 80%; color: rgba(239, 241, 252, 0.78); font-size: 0.78rem; }
+.chef-lab__messages .chef-lab__message span { display: block; margin-bottom: 0.25rem; color: rgba(188, 196, 235, 0.5); font-size: 0.62rem; }
+.chef-lab__messages .chef-lab__message > p,
+.chef-lab__markdown { margin: 0; padding: 0.7rem 0.85rem; border: 1px solid rgba(184, 193, 226, 0.14); border-radius: 0.8rem; background: rgba(255, 255, 255, 0.05); }
+.chef-lab__message--user { margin-left: auto; text-align: right; }
+.chef-lab__message--user > p { background: rgba(116, 107, 255, 0.15) !important; }
+.chef-lab__markdown { color: rgba(242, 244, 255, 0.86); line-height: 1.6; text-align: left; }
+.chef-lab__markdown > :first-child { margin-top: 0; }
+.chef-lab__markdown > :last-child { margin-bottom: 0; }
+.chef-lab__markdown p { margin: 0.55rem 0; }
+.chef-lab__markdown h1,
+.chef-lab__markdown h2,
+.chef-lab__markdown h3 { margin: 0.9rem 0 0.35rem; color: #ffffff; font-weight: 650; line-height: 1.25; }
+.chef-lab__markdown h1 { font-size: 1.08rem; }
+.chef-lab__markdown h2 { font-size: 0.98rem; }
+.chef-lab__markdown h3 { font-size: 0.88rem; }
+.chef-lab__markdown strong { color: #ffffff; font-weight: 700; }
+.chef-lab__markdown ul,
+.chef-lab__markdown ol { margin: 0.55rem 0; padding-left: 1.2rem; }
+.chef-lab__markdown li { margin: 0.25rem 0; padding-left: 0.15rem; }
+.chef-lab__markdown li::marker { color: #aaa0ff; }
+.chef-lab__markdown hr { margin: 0.8rem 0; border: 0; border-top: 1px solid rgba(184, 193, 226, 0.18); }
+.chef-lab__markdown code { padding: 0.12rem 0.3rem; border-radius: 0.3rem; color: #e5dfff; background: rgba(0, 0, 0, 0.28); font-size: 0.72rem; }
+.chef-lab__markdown pre { overflow-x: auto; margin: 0.65rem 0; padding: 0.7rem; border-radius: 0.5rem; background: rgba(0, 0, 0, 0.32); }
+.chef-lab__markdown pre code { padding: 0; background: transparent; }
+.chef-lab__markdown a { color: #bdb4ff; text-decoration: underline; text-underline-offset: 2px; }
+
+@media (max-width: 560px) {
+  .chef-lab__toolbar { gap: 0.3rem; }
+  .chef-lab__mode-button { padding: 0 0.5rem; }
+  .chef-lab__mode-button:nth-of-type(2) { display: none; }
+  .chef-lab__close { top: 0.75rem; right: 0.75rem; }
+}
