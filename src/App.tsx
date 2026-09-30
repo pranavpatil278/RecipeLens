@@ -222,7 +222,7 @@ export default function App() {
     try {
       const result = await apiClient.analyzeDishImage(currentBlobRef.current);
       setAnalysisResult(result);
-      const recipe = await apiClient.generateRecipe(result.analysisId);
+      const recipe = await apiClient.generateRecipe(result);
       setCurrentRecipe(recipe);
       setAppState('ANALYSIS_COMPLETE');
       scrollToActiveWork();
@@ -264,7 +264,7 @@ export default function App() {
   const handleUpdatePreferences = async (prefs: RecipePreferences) => {
     if (!analysisResult) return;
     try {
-      const updated = await apiClient.generateRecipe(analysisResult.analysisId, prefs);
+      const updated = await apiClient.generateRecipe(analysisResult, prefs);
       setCurrentRecipe({
         ...updated,
         spiceLevel: prefs.spiceLevel,

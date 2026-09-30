@@ -6,12 +6,7 @@ import {
   AssistantMessage,
   DiscoveryRecipe,
 } from '../types';
-import {
-  mockButterChickenAnalysis,
-  mockInitialRecipe,
-  mockSubstitutions,
-  mockIngredientDiscovery,
-} from '../data/mockData';
+import { mockSubstitutions } from '../data/mockData';
 
 export interface ApiClientConfig {
   baseUrl?: string;
@@ -68,25 +63,17 @@ export class RecipeLensApiClient {
    * JSON: analysis_id, preferences
    */
   async generateRecipe(
-    analysisId: string,
+    analysis: AnalysisResult,
     preferences?: Partial<RecipePreferences>
   ): Promise<Recipe> {
-    let recipe = { ...mockInitialRecipe };
-    if (preferences?.servings && preferences.servings !== 4) {
-      const scale = preferences.servings / 4;
-      recipe = {
-        ...recipe,
-        servings: preferences.servings,
-        ingredients: recipe.ingredients.map((ing) => {
-          const num = parseFloat(ing.quantity);
-          if (!isNaN(num)) {
-            return { ...ing, quantity: (num * scale).toFixed(scale % 1 === 0 ? 0 : 1) };
-          }
-          return ing;
-        }),
-      };
-    }
-    return recipe;
+    const response = await fetch(`${this.baseUrl}/recipe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ analysis, preferences }),
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(payload?.error || 'We could not generate this recipe. Please try again.');
+    return payload as Recipe;
   }
 
   /**

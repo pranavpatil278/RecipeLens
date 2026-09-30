@@ -108,6 +108,43 @@ export default defineConfig(({ mode }) => {
               }
             });
           });
+          server.middlewares.use('/api/v1/recipe', (request, response, next) => {
+            if (request.method !== 'POST') return next();
+
+            let body = '';
+            request.setEncoding('utf8');
+            request.on('data', (chunk) => {
+              body += chunk;
+            });
+            request.on('end', async () => {
+              response.setHeader('Content-Type', 'application/json');
+              if (!geminiApiKey) {
+                response.statusCode = 503;
+                response.end(JSON.stringify({ error: 'Add GEMINI_API_KEY to .env.local, then restart the development server.' }));
+                return;
+              }
+
+              try {
+                process.env.GEMINI_API_KEY = geminiApiKey;
+                process.env.GEMINI_MODEL = geminiModel;
+                const { default: handler } = await server.ssrLoadModule('/api/v1/recipe.ts');
+                const recipeRequest = { method: request.method, body: JSON.parse(body) };
+                const recipeResponse = {
+                  status(statusCode: number) {
+                    response.statusCode = statusCode;
+                    return this;
+                  },
+                  json(payload: unknown) {
+                    response.end(JSON.stringify(payload));
+                  },
+                };
+                await handler(recipeRequest, recipeResponse);
+              } catch {
+                response.statusCode = 400;
+                response.end(JSON.stringify({ error: 'We could not generate this recipe. Please try again.' }));
+              }
+            });
+          });
           server.middlewares.use('/api/v1/assistant', (request, response, next) => {
             if (request.method !== 'POST') return next();
 
