@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { ApiRequest, ApiResponse, generateGeminiJson, isRecord, numberValue, sendError } from '../../server/gemini';
+import { generateGeminiJson, isRecord, numberValue, sendError } from '../_lib/gemini.js';
+import type { ApiRequest, ApiResponse } from '../_lib/gemini.js';
 
 const difficulties = ['Easy', 'Medium', 'Challenging'];
 const spiceLevels = ['Mild', 'Medium', 'Hot'];

@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { ApiRequest, ApiResponse, generateGeminiJson, isRecord, numberValue, sendError } from '../../server/gemini';
+import { generateGeminiJson, isRecord, numberValue, sendError } from '../_lib/gemini.js';
+import type { ApiRequest, ApiResponse } from '../_lib/gemini.js';
 
 const allowedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 const maxImageLength = 5_900_000;
