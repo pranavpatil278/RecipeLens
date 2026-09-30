@@ -3,7 +3,7 @@ import { Recipe, Ingredient, SubstitutionOption, RecipePreferences } from '../ty
 import { IngredientList } from './IngredientList';
 import { RecipeCustomizer } from './RecipeCustomizer';
 import { SubstitutionPanel } from './SubstitutionPanel';
-import { mockSubstitutions } from '../data/mockData';
+import { apiClient } from '../services/apiClient';
 import {
   ChefHat,
   Clock,
@@ -39,7 +39,24 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
   const [activeSubstituteIngredient, setActiveSubstituteIngredient] = useState<Ingredient | null>(
     null
   );
+  const [substitutions, setSubstitutions] = useState<SubstitutionOption[]>([]);
+  const [isLoadingSubstitutions, setIsLoadingSubstitutions] = useState(false);
+  const [substitutionError, setSubstitutionError] = useState<string | null>(null);
   const [copyFeedback, setCopyFeedback] = useState(false);
+
+  const handleOpenSubstitute = async (ingredient: Ingredient) => {
+    setActiveSubstituteIngredient(ingredient);
+    setSubstitutions([]);
+    setSubstitutionError(null);
+    setIsLoadingSubstitutions(true);
+    try {
+      setSubstitutions(await apiClient.getSubstitutions(recipe, ingredient));
+    } catch (error) {
+      setSubstitutionError(error instanceof Error ? error.message : 'Could not load substitutions.');
+    } finally {
+      setIsLoadingSubstitutions(false);
+    }
+  };
 
   const handleShare = () => {
     navigator.clipboard?.writeText(window.location.href);
@@ -211,7 +228,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
 
           <IngredientList
             ingredients={recipe.ingredients}
-            onOpenSubstitute={(ing) => setActiveSubstituteIngredient(ing)}
+            onOpenSubstitute={(ingredient) => void handleOpenSubstitute(ingredient)}
           />
         </div>
 
@@ -326,9 +343,9 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
       {activeSubstituteIngredient && (
         <SubstitutionPanel
           ingredient={activeSubstituteIngredient}
-          substitutions={mockSubstitutions.filter(
-            (s) => s.targetIngredientId === activeSubstituteIngredient.id
-          )}
+          substitutions={substitutions}
+          isLoading={isLoadingSubstitutions}
+          error={substitutionError}
           onApply={(id, sub) => {
             onApplySubstitution(id, sub);
             setActiveSubstituteIngredient(null);

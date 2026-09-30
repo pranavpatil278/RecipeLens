@@ -152,7 +152,6 @@ export default defineConfig(({ mode }) => {
             request.setEncoding('utf8');
             request.on('data', (chunk) => {
               body += chunk;
-              if (body.length > 30 * 1024 * 1024) request.destroy();
             });
             request.on('end', async () => {
               response.setHeader('Content-Type', 'application/json');
@@ -163,57 +162,60 @@ export default defineConfig(({ mode }) => {
               }
 
               try {
-                const requestBody = JSON.parse(body) as {
-                  message?: string;
-                  mode?: string;
-                  currentStep?: number;
-                  image?: string;
-                  mimeType?: string;
-                };
-                if (!requestBody.message?.trim()) throw new Error('Please enter a question for the AI Chef.');
-                const modeInstruction = {
-                  'Quick answer': 'Answer briefly in 1-3 useful sentences.',
-                  Balanced: 'Give a practical answer with enough explanation to act on it.',
-                  DeepThink: 'Reason carefully about cooking technique, safety, and tradeoffs before answering. Show the key reasoning briefly.',
-                  Research: 'Give a thorough, evidence-aware answer. Be clear about uncertainty and do not invent citations or sources.',
-                }[requestBody.mode || 'Balanced'] || 'Give a practical answer with enough explanation to act on it.';
-                const prompt = [
-                  'You are RecipeLens AI Chef, a precise and friendly culinary assistant.',
-                  modeInstruction,
-                  requestBody.currentStep ? `The user is currently on cooking step ${requestBody.currentStep}.` : '',
-                  'Answer the user directly. Include concrete quantities, temperatures, timing, or visual cues when relevant. Mention food-safety concerns when relevant.',
-                  `User question: ${requestBody.message.trim()}`,
-                ].filter(Boolean).join('\n');
-                const parts: Array<Record<string, unknown>> = [{ text: prompt }];
-                if (requestBody.image && requestBody.mimeType?.startsWith('image/')) {
-                  parts.push({ inlineData: { mimeType: requestBody.mimeType, data: requestBody.image } });
-                }
-                const geminiResponse = await fetch(
-                  `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`,
-                  {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts }] }),
+                process.env.GEMINI_API_KEY = geminiApiKey;
+                process.env.GEMINI_MODEL = geminiModel;
+                const { default: handler } = await server.ssrLoadModule('/api/v1/assistant.ts');
+                const assistantRequest = { method: request.method, body: JSON.parse(body) };
+                const assistantResponse = {
+                  status(statusCode: number) {
+                    response.statusCode = statusCode;
+                    return this;
                   },
-                );
-                if (!geminiResponse.ok) {
-                  const errorBody = await geminiResponse.text();
-                  let detail = `HTTP ${geminiResponse.status}`;
-                  try {
-                    const parsedError = JSON.parse(errorBody) as { error?: { message?: string } };
-                    detail = parsedError.error?.message || detail;
-                  } catch {
-                    // Keep the HTTP status when Gemini does not return JSON.
-                  }
-                  throw new Error(`Gemini could not answer this question: ${detail}`);
-                }
-                const payload = await geminiResponse.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
-                const text = payload.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('').trim();
-                if (!text) throw new Error('Gemini returned no answer.');
-                response.end(JSON.stringify({ id: `msg_${Date.now()}`, sender: 'assistant', text, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }));
-              } catch (error) {
-                response.statusCode = 422;
-                response.end(JSON.stringify({ error: error instanceof Error ? error.message : 'The AI Chef could not answer.' }));
+                  json(payload: unknown) {
+                    response.end(JSON.stringify(payload));
+                  },
+                };
+                await handler(assistantRequest, assistantResponse);
+              } catch {
+                response.statusCode = 400;
+                response.end(JSON.stringify({ error: 'The AI Chef could not answer right now. Please try again.' }));
+              }
+            });
+          });
+          server.middlewares.use('/api/v1/substitute', (request, response, next) => {
+            if (request.method !== 'POST') return next();
+
+            let body = '';
+            request.setEncoding('utf8');
+            request.on('data', (chunk) => {
+              body += chunk;
+            });
+            request.on('end', async () => {
+              response.setHeader('Content-Type', 'application/json');
+              if (!geminiApiKey) {
+                response.statusCode = 503;
+                response.end(JSON.stringify({ error: 'Add GEMINI_API_KEY to .env.local, then restart the development server.' }));
+                return;
+              }
+
+              try {
+                process.env.GEMINI_API_KEY = geminiApiKey;
+                process.env.GEMINI_MODEL = geminiModel;
+                const { default: handler } = await server.ssrLoadModule('/api/v1/substitute.ts');
+                const substituteRequest = { method: request.method, body: JSON.parse(body) };
+                const substituteResponse = {
+                  status(statusCode: number) {
+                    response.statusCode = statusCode;
+                    return this;
+                  },
+                  json(payload: unknown) {
+                    response.end(JSON.stringify(payload));
+                  },
+                };
+                await handler(substituteRequest, substituteResponse);
+              } catch {
+                response.statusCode = 400;
+                response.end(JSON.stringify({ error: 'We could not find substitutions. Please try again.' }));
               }
             });
           });

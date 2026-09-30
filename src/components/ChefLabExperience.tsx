@@ -204,7 +204,11 @@ export function ChefLabExperience({ onClose }: { onClose: () => void }) {
     setInput('');
     setIsTyping(true);
     try {
-      const response = await apiClient.askAssistant('global-chef', text, undefined, { mode, image: attachedImage?.file });
+      const response = await apiClient.askAssistant('global-chef', text, undefined, {
+        mode,
+        image: attachedImage?.file,
+        history: messages.slice(-8).map(({ sender, text: messageText }) => ({ sender, text: messageText })),
+      });
       setMessages((current) => [...current, response]);
     } catch (error) {
       setMessages((current) => [...current, {

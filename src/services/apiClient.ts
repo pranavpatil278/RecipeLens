@@ -6,7 +6,6 @@ import {
   AssistantMessage,
   DiscoveryRecipe,
 } from '../types';
-import { mockSubstitutions } from '../data/mockData';
 
 export interface ApiClientConfig {
   baseUrl?: string;
@@ -15,6 +14,8 @@ export interface ApiClientConfig {
 export interface AssistantRequestOptions {
   mode?: string;
   image?: Blob | File;
+  recipe?: Recipe;
+  history?: Array<Pick<AssistantMessage, 'sender' | 'text'>>;
 }
 
 export class RecipeLensApiClient {
@@ -81,12 +82,17 @@ export class RecipeLensApiClient {
    * JSON: recipe_id, ingredient, constraints
    */
   async getSubstitutions(
-    recipeId: string,
-    ingredientId: string,
-    constraints?: string[]
+    recipe: Recipe,
+    ingredient: Recipe['ingredients'][number],
   ): Promise<SubstitutionOption[]> {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return mockSubstitutions.filter((sub) => sub.targetIngredientId === ingredientId);
+    const response = await fetch(`${this.baseUrl}/substitute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recipe, ingredient }),
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(payload?.error || 'We could not find substitutions. Please try again.');
+    return Array.isArray(payload?.substitutions) ? payload.substitutions as SubstitutionOption[] : [];
   }
 
   /**
@@ -117,45 +123,26 @@ export class RecipeLensApiClient {
       const response = await fetch(`${this.baseUrl}/assistant`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recipeId, message, currentStep, mode: options.mode || 'Normal', image, mimeType }),
+        body: JSON.stringify({
+          recipeId,
+          message,
+          currentStep,
+          mode: options.mode || 'Normal',
+          image,
+          mimeType,
+          recipe: options.recipe,
+          history: options.history,
+        }),
       });
       const payload = await response.json().catch(() => null);
-      if (response.ok && payload?.text) return payload as AssistantMessage;
-      if (response.status !== 503 && response.status !== 404) {
+      if (!response.ok || !payload?.text) {
         throw new Error(payload?.error || 'The AI Chef could not respond right now.');
       }
+      return payload as AssistantMessage;
     } catch (error) {
-      if (error instanceof TypeError) {
-        // Keep the local development experience usable when the API server is unavailable.
-      } else if (error instanceof Error && !error.message.includes('fetch')) {
-        throw error;
-      }
+      if (error instanceof Error) throw error;
+      throw new Error('The AI Chef could not respond right now.');
     }
-
-    const lower = message.toLowerCase();
-    let reply =
-      "For optimal texture, let the simmer continue on gentle low heat. The butter and spices will emulsify smoothly into the cream.";
-
-    if (lower.includes('replace') || lower.includes('substitute') || lower.includes('cream')) {
-      reply =
-        "You can substitute heavy cream with full-fat coconut milk (1:1 ratio) for a fragrant dairy-free finish, or whisk Greek yogurt with 1 tbsp warm water for a lighter profile.";
-    } else if (lower.includes('step') || lower.includes('done') || lower.includes('know')) {
-      reply =
-        "Watch for visual separation of oil from the tomato gravy edges and gentle, glistening bubbles. The aroma will turn deeply savory and round.";
-    } else if (lower.includes('spicy') || lower.includes('heat')) {
-      reply =
-        "To dial down heat, add an extra tablespoon of unsalted butter or heavy cream, or swirl in a half teaspoon of raw honey or brown sugar.";
-    } else if (lower.includes('why') || lower.includes('necessary')) {
-      reply =
-        "Searing the chicken first locks in moisture and creates fond (caramelized bits) on the pan floor, which deglazes into the sauce to produce genuine restaurant depth.";
-    }
-
-    return {
-      id: `msg_${Date.now()}`,
-      sender: 'assistant',
-      text: reply,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
   }
 
   /**

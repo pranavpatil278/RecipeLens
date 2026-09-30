@@ -61,7 +61,10 @@ export const RecipeAssistant: React.FC<RecipeAssistantProps> = ({
     setIsTyping(true);
 
     try {
-      const response = await apiClient.askAssistant(recipe.recipeId, trimmed, currentStep);
+      const response = await apiClient.askAssistant(recipe.recipeId, trimmed, currentStep, {
+        recipe,
+        history: messages.slice(-8).map(({ sender, text }) => ({ sender, text })),
+      });
       setMessages((prev) => [...prev, response]);
     } catch {
       setMessages((prev) => [

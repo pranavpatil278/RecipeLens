@@ -23,6 +23,22 @@ export async function generateGeminiJson(
   prompt: string,
   image?: { mimeType: string; data: string },
 ): Promise<Record<string, unknown>> {
+  const text = await generateGeminiText(prompt, image, true);
+
+  try {
+    const parsed: unknown = JSON.parse(text.replace(/^```json\s*|\s*```$/g, ''));
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Expected a JSON object.');
+    return parsed as Record<string, unknown>;
+  } catch {
+    throw new ApiError(502, 'Gemini returned an invalid result. Please try again.');
+  }
+}
+
+export async function generateGeminiText(
+  prompt: string,
+  image?: { mimeType: string; data: string },
+  jsonResponse = false,
+): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new ApiError(503, 'Gemini is not configured on this deployment.');
 
@@ -37,19 +53,12 @@ export async function generateGeminiJson(
         ...(image ? [{ inlineData: { mimeType: image.mimeType, data: image.data } }] : []),
       ],
     }],
-    config: { responseMimeType: 'application/json' },
+    ...(jsonResponse ? { config: { responseMimeType: 'application/json' } } : {}),
   });
 
   const text = response.text?.trim();
   if (!text) throw new ApiError(502, 'Gemini returned no result. Please try again.');
-
-  try {
-    const parsed: unknown = JSON.parse(text.replace(/^```json\s*|\s*```$/g, ''));
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Expected a JSON object.');
-    return parsed as Record<string, unknown>;
-  } catch {
-    throw new ApiError(502, 'Gemini returned an invalid result. Please try again.');
-  }
+  return text;
 }
 
 export function sendError(response: ApiResponse, error: unknown, fallback: string): void {

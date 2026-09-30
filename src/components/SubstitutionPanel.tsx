@@ -5,6 +5,8 @@ import { X, Check, RefreshCw, Sparkles, ArrowRight, ShieldCheck } from 'lucide-r
 interface SubstitutionPanelProps {
   ingredient: Ingredient;
   substitutions: SubstitutionOption[];
+  isLoading?: boolean;
+  error?: string | null;
   onApply: (ingredientId: string, substitute: SubstitutionOption) => void;
   onClose: () => void;
 }
@@ -12,6 +14,8 @@ interface SubstitutionPanelProps {
 export const SubstitutionPanel: React.FC<SubstitutionPanelProps> = ({
   ingredient,
   substitutions,
+  isLoading = false,
+  error,
   onApply,
   onClose,
 }) => {
@@ -90,7 +94,15 @@ export const SubstitutionPanel: React.FC<SubstitutionPanelProps> = ({
               Suggested AI Alternatives ({substitutions.length})
             </label>
 
-            {substitutions.length === 0 ? (
+            {isLoading ? (
+              <div role="status" className="p-6 text-center border border-dashed border-[#263A20]/20 rounded-2xl text-xs text-[#263A20]/70">
+                Finding suitable alternatives...
+              </div>
+            ) : error ? (
+              <div role="alert" className="p-6 text-center border border-dashed border-[#263A20]/20 rounded-2xl text-xs text-[#263A20]/70">
+                {error}
+              </div>
+            ) : substitutions.length === 0 ? (
               <div className="p-6 text-center border border-dashed border-[#263A20]/20 rounded-2xl text-xs text-[#263A20]/70">
                 No direct culinary substitutions for this specialty spice. It provides core identity to the dish.
               </div>
