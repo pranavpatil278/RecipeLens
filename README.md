@@ -4,6 +4,7 @@ RecipeLens is an AI-powered food recognition and recipe generation application t
 
 ## Architecture Overview
 
+```text
 
                          USER INTERFACE (React + Vite)
 ┌──────────────────────────────────────────────────────────────────────────────┐
