@@ -6,7 +6,7 @@ import { defineConfig, loadEnv } from 'vite';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const geminiApiKey = env.GEMINI_API_KEY;
-  const geminiModel = env.GEMINI_MODEL || 'gemini-3.6-flash';
+  const geminiModel = env.GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
 
   return {
     plugins: [

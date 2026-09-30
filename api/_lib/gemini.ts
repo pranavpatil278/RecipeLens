@@ -1,3 +1,5 @@
+import { GoogleGenAI } from '@google/genai';
+
 export interface ApiRequest {
   method?: string;
   body?: unknown;
@@ -24,33 +26,21 @@ export async function generateGeminiJson(
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new ApiError(503, 'Gemini is not configured on this deployment.');
 
-  const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
-  const parts: Array<Record<string, unknown>> = [{ text: prompt }];
-  if (image) parts.push({ inlineData: { mimeType: image.mimeType, data: image.data } });
+  const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+  const ai = new GoogleGenAI({ apiKey });
+  const response = await ai.models.generateContent({
+    model,
+    contents: [{
+      role: 'user',
+      parts: [
+        { text: prompt },
+        ...(image ? [{ inlineData: { mimeType: image.mimeType, data: image.data } }] : []),
+      ],
+    }],
+    config: { responseMimeType: 'application/json' },
+  });
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': apiKey,
-      },
-      body: JSON.stringify({
-        contents: [{ parts }],
-        generationConfig: { responseMimeType: 'application/json' },
-      }),
-    },
-  );
-
-  if (!response.ok) {
-    throw new ApiError(502, `Gemini request failed with HTTP ${response.status}.`);
-  }
-
-  const payload = await response.json() as {
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-  };
-  const text = payload.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('').trim();
+  const text = response.text?.trim();
   if (!text) throw new ApiError(502, 'Gemini returned no result. Please try again.');
 
   try {
